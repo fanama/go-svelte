@@ -2,7 +2,7 @@
 
     import Headder from './utils/headder.svelte'
     import Liste from './dashboard/liste/liste.svelte'
-
+    import Condition from './dashboard/condition/index.svelte'
     let name="fanama";
 
     const changeName = (e)=>{
@@ -11,19 +11,22 @@
     
 
   </script>
+
+  <style>
+    h1 {
+      text-align: center;
+    }
+  </style>
   
 
   <main>
     <Headder name="my svelte" />
 
     <h1>Hello {name}!</h1>
+    <Condition name={name} />
     
     
     <div class="list">
-
-      { #if name=="fanama"}
-        you are the owner!!!
-      {/if}
 
       <Liste name={name} on:alert={changeName} />
       
