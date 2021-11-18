@@ -22,9 +22,9 @@ func Test_Creation(t *testing.T) {
 }
 
 func Test_Insert(t *testing.T) {
-	heroes := map[string]string{"name": "vegeta", "power": "16000"}
+	heroes := map[string]string{"name": "piccolo", "power": "3500"}
 
-	err := Write("elements", heroes)
+	err := Write("heroes", heroes)
 
 	if err != nil {
 		t.Errorf("error : %v", err)

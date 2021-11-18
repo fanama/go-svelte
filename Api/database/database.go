@@ -42,10 +42,12 @@ func Write(db string, element map[string]string) (err error) {
 	_, err = os.Stat(filePath)
 
 	if err != nil {
-		return err
+		if err = CreateDB(db); err != nil {
+			return err
+		}
 	}
 
-	f, err := os.OpenFile(filePath, os.O_RDWR, 0644)
+	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -54,20 +56,27 @@ func Write(db string, element map[string]string) (err error) {
 
 	var elements []string
 
+	var stringToAppend string
+
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 
-		lines := scanner.Text()
-		elements = strings.Split(lines, "\n")
+		line := scanner.Text()
+		fmt.Println("line :", line)
+		elements = append(elements, line)
 
 	}
 
 	for key, val := range element {
-		element := fmt.Sprint(key, ":", val)
-		elements = append(elements, element)
+		stringToAppend = fmt.Sprint(key, ":", val)
+		elements = append(elements, stringToAppend)
 	}
 
-	_, err = f.WriteString("\n\n" + strings.Join(elements, "\n"))
+	for i, e := range elements {
+		fmt.Println(i, e)
+	}
+
+	_, err = f.WriteString("\n" + strings.Join(elements, "\n"))
 	if err != nil {
 		return err
 	}
