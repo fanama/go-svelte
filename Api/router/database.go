@@ -2,75 +2,52 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 
 	"github.com/fanama/go-svelte/Api/database"
+	"github.com/gofiber/fiber/v2"
 )
 
-func InsertData(w http.ResponseWriter, r *http.Request) {
+func InsertData(c *fiber.Ctx) (err error) {
+	body := c.Body()
+	db := c.Params("database")
 
-	keys, ok := r.URL.Query()["db"]
+	var data map[string]string
 
-	if !ok || len(keys[0]) < 1 {
-		fmt.Println("Url Param 'key' is missing")
-		return
-	}
-
-	db := string(keys[0])
-
-	// Declare a new Person struct.
-	var p map[string]string
-
-	// Try to decode the request body into the struct. If there is an error,
-	// respond to the client with the error message and a 400 status code.
-	err := json.NewDecoder(r.Body).Decode(&p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Do something with the Person struct...
-
-	err = database.Write(db, p)
+	err = json.Unmarshal(body, &data)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusFailedDependency)
-
-		return
+		return c.Status(400).JSON(err)
 	}
 
-	fmt.Fprintf(w, "insertin Data : %+v into %v success!!!", p, db)
+	err = database.Write(db, data)
+
+	if err != nil {
+		return c.Status(400).JSON(err)
+	}
+
+	return c.JSON("success!!")
 }
 
-func GetData(w http.ResponseWriter, r *http.Request) {
+func GetData(c *fiber.Ctx) error {
+	db := c.Params("database")
 
-	keys, ok := r.URL.Query()["db"]
-
-	if !ok || len(keys[0]) < 1 {
-		fmt.Println("Url Querry 'key' is missing")
-		return
-	}
-
-	db := string(keys[0])
-
-	results, err := database.Read(db)
+	result, err := database.Read(db)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusFailedDependency)
-
-		return
+		return c.Status(400).JSON(err)
 	}
 
-	jsonStr, err := json.Marshal(results)
+	return c.JSON(result)
+}
+
+func DeleteData(c *fiber.Ctx) error {
+	db := c.Params("database")
+
+	result, err := database.Read(db)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusFailedDependency)
-
-		return
+		return c.Status(400).JSON(err)
 	}
 
-	fmt.Fprintf(w, string(jsonStr))
-
-	return
+	return c.JSON(result)
 }

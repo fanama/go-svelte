@@ -29,6 +29,52 @@ func CreateDB(name string) (err error) {
 	return nil
 }
 
+func Read(db string) (result map[string]string, err error) {
+
+	folder, err := GetPath()
+
+	if err != nil {
+		return result, err
+	}
+
+	filePath := fmt.Sprint(folder, db, ".rk")
+
+	_, err = os.Stat(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := os.OpenFile(filePath, os.O_RDONLY, 0644)
+	if err != nil {
+		return result, err
+	}
+
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	result = map[string]string{}
+
+	for scanner.Scan() {
+
+		line := scanner.Text()
+
+		value := strings.Split(line, ":")
+		if len(value) >= 2 {
+			result[value[0]] = value[1]
+		}
+
+	}
+
+	if len(result) <= 0 {
+		err = fmt.Errorf("no result found : %v", filePath)
+
+		return result, err
+	}
+
+	return result, err
+}
+
 func Write(db string, element map[string]string) (err error) {
 
 	folder, err := GetPath()
@@ -80,12 +126,38 @@ func Write(db string, element map[string]string) (err error) {
 
 }
 
-func Read(db string) (result []map[string]string, err error) {
+// func Delete(db string, element map[string]string) (err error) {
+
+// 	elements, err := Read(db)
+
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	fmt.Println("avant : ", elements)
+
+// 	for i, el := range elements {
+// 		for k1, v1 := range el {
+// 			for k2, v2 := range element {
+// 				if k1 == k2 && v1 == v2 {
+// 					Cut(elements, i)
+// 				}
+// 			}
+// 		}
+
+// 	}
+
+// 	fmt.Println("après : ", elements)
+
+// 	return err
+// }
+
+func DeleteDB(db string) (err error) {
 
 	folder, err := GetPath()
 
 	if err != nil {
-		return result, err
+		return err
 	}
 
 	filePath := fmt.Sprint(folder, db, ".rk")
@@ -93,35 +165,10 @@ func Read(db string) (result []map[string]string, err error) {
 	_, err = os.Stat(filePath)
 
 	if err != nil {
-		return nil, err
+		return nil
 	}
 
-	f, err := os.OpenFile(filePath, os.O_RDONLY, 0644)
-	if err != nil {
-		return result, err
-	}
+	err = os.Remove(filePath)
 
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	for scanner.Scan() {
-
-		line := scanner.Text()
-
-		value := strings.Split(line, ":")
-		if len(value) >= 2 {
-			valueReady := map[string]string{value[0]: value[1]}
-			result = append(result, valueReady)
-		}
-
-	}
-
-	if len(result) <= 0 {
-		err = fmt.Errorf("no result found : %v", filePath)
-
-		return result, err
-	}
-
-	return result, err
+	return err
 }

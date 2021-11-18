@@ -1,17 +1,19 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/fanama/go-svelte/Api/router"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
+	app := fiber.New()
 
-	http.HandleFunc("/hello", router.Hello)
-	http.HandleFunc("/headers", router.Headers)
-	http.HandleFunc("/get", router.GetData)       // ?db=test
-	http.HandleFunc("/insert", router.InsertData) //?db=test
+	app.Use(cors.New())
 
-	http.ListenAndServe(":8090", nil)
+	app.Get("/database/:database", router.GetData)
+	app.Post("/database/:database", router.InsertData)
+	app.Delete("/database/:database", router.DeleteData)
+
+	app.Listen(":8090")
 }

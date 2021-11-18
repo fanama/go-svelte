@@ -3,6 +3,7 @@
     import Headder from './utils/headder.svelte'
     import Liste from './dashboard/liste/liste.svelte'
     import Condition from './dashboard/condition/index.svelte'
+    import Form from "./dashboard/formulaire/index.svelte"
     let name="fanama";
 
     const changeName = (e)=>{
@@ -22,14 +23,14 @@
   <main>
     <Headder name="my svelte" />
 
-    <h1>Hello {name}!</h1>
+    <h1>Hello {name}! {process.env.API} </h1>
     <Condition name={name} />
     
     
     <div class="list">
 
       <Liste name={name} on:alert={changeName} />
-      
+      <Form/>
 
     </div>
     

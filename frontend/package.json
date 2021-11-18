@@ -17,5 +17,7 @@
   },
   "dependencies": {
     "svelte-preprocess": "^4.9.8"
-  }
+  },
+  "proxy":"http://localhost:8090"
+  
 }
