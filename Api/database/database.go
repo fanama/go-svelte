@@ -62,7 +62,6 @@ func Write(db string, element map[string]string) (err error) {
 	for scanner.Scan() {
 
 		line := scanner.Text()
-		fmt.Println("line :", line)
 		elements = append(elements, line)
 
 	}
@@ -72,15 +71,57 @@ func Write(db string, element map[string]string) (err error) {
 		elements = append(elements, stringToAppend)
 	}
 
-	for i, e := range elements {
-		fmt.Println(i, e)
-	}
-
-	_, err = f.WriteString("\n" + strings.Join(elements, "\n"))
+	_, err = f.WriteString("\n" + strings.Join(elements, "\n") + "\n")
 	if err != nil {
 		return err
 	}
 
 	return nil
 
+}
+
+func Read(db string) (result []map[string]string, err error) {
+
+	folder, err := GetPath()
+
+	if err != nil {
+		return result, err
+	}
+
+	filePath := fmt.Sprint(folder, db, ".rk")
+
+	_, err = os.Stat(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := os.OpenFile(filePath, os.O_RDONLY, 0644)
+	if err != nil {
+		return result, err
+	}
+
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+
+		line := scanner.Text()
+
+		value := strings.Split(line, ":")
+		if len(value) >= 2 {
+			valueReady := map[string]string{value[0]: value[1]}
+			result = append(result, valueReady)
+		}
+
+	}
+
+	if len(result) <= 0 {
+		err = fmt.Errorf("no result found : %v", filePath)
+
+		return result, err
+	}
+
+	return result, err
 }

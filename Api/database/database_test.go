@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -10,7 +9,7 @@ func Test_GetPath(t *testing.T) {
 	if err != nil {
 		t.Errorf("error : %v", err)
 	}
-	fmt.Println(res)
+	t.Logf(res)
 }
 
 func Test_Creation(t *testing.T) {
@@ -22,11 +21,24 @@ func Test_Creation(t *testing.T) {
 }
 
 func Test_Insert(t *testing.T) {
-	heroes := map[string]string{"name": "piccolo", "power": "3500"}
+	heroes := map[string]string{"name": "rochi", "power": "500"}
 
 	err := Write("heroes", heroes)
 
 	if err != nil {
 		t.Errorf("error : %v", err)
 	}
+
+}
+
+func Test_Read(t *testing.T) {
+
+	result, err := Read("heroes")
+
+	if err != nil {
+		t.Errorf("error : %v", err)
+	}
+
+	t.Logf("results : %v", result)
+
 }
